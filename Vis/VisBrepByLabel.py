@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import pickle
 from occwl.viewer import Viewer
 from occwl.graph import face_adjacency
 from occwl.uvgrid import ugrid, uvgrid
@@ -14,6 +15,34 @@ import dgl
 import shutup
 shutup.please()
 
+# --- 新增：读取标签
+def load_labels_from_pkl(label_filename):
+    with open(label_filename, "rb") as f:
+        data = pickle.load(f)  # numpy.ndarray，里面元素是dict
+    face_labels_dict = data['face_labels']
+    sorted_items = sorted(face_labels_dict.items(), key=lambda x: int(x[0]))
+    labels = np.array([v for k,v in sorted_items], dtype=int)
+    return labels
+
+# --- 新增：根据label给面上色，替代display_all_faces
+def display_faces_with_labels(viewer, face_obj_list, labels):
+    # 这里定义固定的颜色映射（RGB），颜色可以根据需要改淡一点
+    label_to_color = {
+        0: (0.8, 0.4, 0.4),   # 淡红
+        1: (0.4, 0.8, 0.4),   # 淡绿
+        2: (0.4, 0.4, 0.8),   # 淡蓝
+        3: (0.8, 0.8, 0.4),   # 淡黄
+        4: (0.8, 0.4, 0.8),   # 淡紫
+        5: (0.4, 0.8, 0.8),   # 淡青
+        # 你可以继续定义更多颜色...
+    }
+    # 如果遇到未定义label，则给它灰色
+    default_color = (0.7, 0.7, 0.7)
+
+    for idx, face in enumerate(face_obj_list):
+        lab = labels[idx]
+        color = label_to_color.get(lab, default_color)
+        viewer.display(face, color=color)
 
 def load_single_compound_from_step(step_filename):
     return Compound.load_from_step(step_filename)
@@ -68,9 +97,6 @@ def build_graph(solid, curv_num_u_samples, surf_num_u_samples, surf_num_v_sample
     return dgl_graph
 
 def display_all_faces(viewer, face_obj_list, highlight_indices=None, highlight_color=(1,0,0), default_color=(0.7,0.7,0.7)):
-    """
-    将所有面绘制到viewer，高亮highlight_indices对应的面
-    """
     highlight_indices = highlight_indices or []
     for idx, face in enumerate(face_obj_list):
         if idx in highlight_indices:
@@ -79,25 +105,14 @@ def display_all_faces(viewer, face_obj_list, highlight_indices=None, highlight_c
             viewer.display(face, color=default_color)
 
 def display_edge_with_fake_width(viewer, edge, color=(1,0,0), width=12, n_sample=80):
-    """
-    用打点方式伪造粗边
-    :param viewer: occwl.Viewer
-    :param edge: occwl.edge.Edge
-    :param color: RGB
-    :param width: 点大小
-    :param n_sample: 采样点数
-    """
     points = ugrid(edge, method="point", num_u=n_sample)
     viewer.display_points(points, color=color, marker="point", scale=width)
 
 def display_all_edges(viewer, edge_obj_list, highlight_indices=None, highlight_color=(0,1,0), default_color=(0.2,0.2,0.2), fake_width=14):
-    """
-    将所有边绘制到viewer，高亮highlight_indices对应的边（粗线高亮）
-    """
     highlight_indices = highlight_indices or []
     for idx, edge in enumerate(edge_obj_list):
         if idx in highlight_indices:
-            viewer.display(edge, color=highlight_color)  # 原生线
+            viewer.display(edge, color=highlight_color)
             display_edge_with_fake_width(viewer, edge, color=highlight_color, width=fake_width, n_sample=100)
         else:
             viewer.display(edge, color=default_color)
@@ -108,34 +123,37 @@ if __name__ == "__main__":
         "Visualize and color selected edges of BRep solid"
     )
     parser.add_argument("--solid", type=str, help="Solid STEP file")
+    parser.add_argument("--label", type=str, help="Label pkl file")  # 新增label参数
     args = parser.parse_args()
 
     # 如果你要传命令行参数，就注释掉下面这行
-    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00010.step'
+    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00028.step'
+    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00028.pkl'
 
     solid = load_step(args.solid)[0]
     solid = solid.scale_to_unit_box()
     graph = build_graph(solid, 10, 10, 10)
 
+    # 新增读取标签
+    labels = load_labels_from_pkl(args.label)
+    assert len(labels) == len(graph.face_obj_list), f"label数({len(labels)})和面数({len(graph.face_obj_list)})不匹配"
+
     v = Viewer(backend="pyqt5")
 
-    # --- 绘制所有面（可选）
-    display_all_faces(
-        v, 
-        graph.face_obj_list, 
-        highlight_indices=[6,7,8,9,10],      # 这里可以指定要高亮的面编号，如 [2,5]
-        highlight_color=(0,1,0), 
-        default_color=(0.8,0.8,0.8)
+    # 改用标签上色
+    display_faces_with_labels(
+        v,
+        graph.face_obj_list,
+        labels
     )
 
-    # --- 绘制所有边，高亮[5,3,1]号边
     display_all_edges(
-        v, 
-        graph.edge_obj_list, 
-        highlight_indices=[], 
-        highlight_color=(1,0,0),   # 红色
+        v,
+        graph.edge_obj_list,
+        highlight_indices=[],
+        highlight_color=(1,0,0),
         default_color=(0.3,0.3,0.3),
-        fake_width=18               # 你想要的粗度
+        fake_width=18
     )
 
     v.fit()

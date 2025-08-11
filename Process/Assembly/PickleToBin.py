@@ -132,13 +132,13 @@ def example_verify_new_structure(bin_path):
     print(restored_filenames)
 
 if __name__ == '__main__':
-    input_pickle_file = "/workspace/data/JointData/Preprocessed/joint/val.pickle"
-    output_directory = '/workspace/data/JointData/Preprocessed/bin/val'
+    input_pickle_file = "D:/CAD数据集/j1.0.0\joint/j1.0.0_preprocessed/joint/test.pickle"
+    output_directory = "D:/CAD数据集/j1.0.0/joint/j1.0.0_preprocessed/joint/test_bin"
 
     process_and_save_new_structure(input_pickle_file, output_directory)
     
     # 验证环节
-    if os.path.exists(output_directory):
-        example_bin_file = os.path.join(output_directory, "joint_set_03832.bin")
-        if os.path.exists(example_bin_file):
-             example_verify_new_structure(example_bin_file)
+    # if os.path.exists(output_directory):
+    #     example_bin_file = os.path.join(output_directory, "joint_set_03832.bin")
+    #     if os.path.exists(example_bin_file):
+    #          example_verify_new_structure(example_bin_file)
