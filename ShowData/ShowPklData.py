@@ -9,7 +9,7 @@ def load_labels(label_filename):
     return np.array(labels)
 
 
-data = load_labels("D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00028.pkl")
+data = load_labels("D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00017.pkl")
 
 
 

@@ -1,4 +1,5 @@
 import argparse
+import sys
 import numpy as np
 from occwl.viewer import Viewer
 from occwl.graph import face_adjacency
@@ -111,11 +112,40 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 如果你要传命令行参数，就注释掉下面这行
-    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00010.step'
+    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00050.step'
 
-    solid = load_step(args.solid)[0]
-    solid = solid.scale_to_unit_box()
-    graph = build_graph(solid, 10, 10, 10)
+    print(f"正在加载 STEP 文件: {args.solid}...")
+    compound = load_single_compound_from_step(args.solid)
+    if compound is None:
+        print(f"错误：无法加载 STEP 文件 '{args.solid}'。文件可能已损坏或格式不受支持。")
+        sys.exit(1)
+
+    # 在对任何部分进行操作前，先进行缩放
+    compound = compound.scale_to_unit_box()
+
+    entity_to_process = None
+
+    # 1. 优先寻找 Solid
+    solids = list(compound.solids())
+    if solids:
+        print(f"成功找到 {len(solids)} 个 Solid 实体。将处理第一个。")
+        entity_to_process = solids[0]
+    else:
+        # 2. 如果没有 Solid，则寻找 Shell
+        print("未找到 Solid。正在尝试寻找 Shell...")
+        shells = list(compound.shells())
+        if shells:
+            print(f"成功找到 {len(shells)} 个 Shell 实体。将处理第一个。")
+            entity_to_process = shells[0]
+        else:
+            # 3. 如果连 Shell 都没有，则报错退出
+            print("错误：在文件中既没有找到 Solid 也没有找到 Shell。无法构建面邻接图。")
+            print("请检查 STEP 文件，它可能只包含离散的面或线，或者是一个空的 Compound。")
+            # 也可以尝试直接用 compound.faces() 获取所有面进行可视化，但无法建立邻接关系
+            sys.exit(1)
+    
+    # 现在 entity_to_process 要么是一个 Solid，要么是一个 Shell
+    graph = build_graph(entity_to_process, 10, 10, 10)
 
     v = Viewer(backend="pyqt5")
 

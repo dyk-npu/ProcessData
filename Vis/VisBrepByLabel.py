@@ -7,26 +7,28 @@ from occwl.uvgrid import ugrid, uvgrid
 
 from occwl.edge import Edge
 from occwl.solid import Solid
+from occwl.shell import Shell # 导入 Shell
 from occwl.compound import Compound
 
 import torch
 import dgl
+import sys
 
 import shutup
 shutup.please()
 
+# ... (所有函数定义保持不变) ...
 # --- 新增：读取标签
 def load_labels_from_pkl(label_filename):
     with open(label_filename, "rb") as f:
-        data = pickle.load(f)  # numpy.ndarray，里面元素是dict
+        data = pickle.load(f)
     face_labels_dict = data['face_labels']
     sorted_items = sorted(face_labels_dict.items(), key=lambda x: int(x[0]))
     labels = np.array([v for k,v in sorted_items], dtype=int)
     return labels
 
-# --- 新增：根据label给面上色，替代display_all_faces
+# --- 新增：根据label给面上色
 def display_faces_with_labels(viewer, face_obj_list, labels):
-    # 这里定义固定的颜色映射（RGB），颜色可以根据需要改淡一点
     label_to_color = {
         0: (0.8, 0.4, 0.4),   # 淡红
         1: (0.4, 0.8, 0.4),   # 淡绿
@@ -36,9 +38,7 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
         5: (0.4, 0.8, 0.8),   # 淡青
         # 你可以继续定义更多颜色...
     }
-    # 如果遇到未定义label，则给它灰色
     default_color = (0.7, 0.7, 0.7)
-
     for idx, face in enumerate(face_obj_list):
         lab = labels[idx]
         color = label_to_color.get(lab, default_color)
@@ -47,12 +47,10 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
 def load_single_compound_from_step(step_filename):
     return Compound.load_from_step(step_filename)
 
-def load_step(step_filename):
-    compound = load_single_compound_from_step(step_filename)
-    return list(compound.solids())
-
-def build_graph(solid, curv_num_u_samples, surf_num_u_samples, surf_num_v_samples):
-    graph = face_adjacency(solid)
+def build_graph(entity, curv_num_u_samples, surf_num_u_samples, surf_num_v_samples):
+    # build_graph 函数可以同时接受 Solid 或 Shell 对象
+    # 因为 face_adjacency 可以在这两种类型上工作
+    graph = face_adjacency(entity)
 
     graph_face_feat = []
     for face_idx in graph.nodes:
@@ -91,56 +89,72 @@ def build_graph(solid, curv_num_u_samples, surf_num_u_samples, surf_num_v_sample
     dgl_graph.ndata["x"] = torch.from_numpy(graph_face_feat)
     dgl_graph.edata["x"] = torch.from_numpy(graph_edge_feat)
     dgl_graph.edge_obj_list = edge_obj_list
-    # 保存面对象
     face_obj_list = [graph.nodes[face_idx]["face"] for face_idx in graph.nodes]
     dgl_graph.face_obj_list = face_obj_list
     return dgl_graph
-
-def display_all_faces(viewer, face_obj_list, highlight_indices=None, highlight_color=(1,0,0), default_color=(0.7,0.7,0.7)):
-    highlight_indices = highlight_indices or []
-    for idx, face in enumerate(face_obj_list):
-        if idx in highlight_indices:
-            viewer.display(face, color=highlight_color)
-        else:
-            viewer.display(face, color=default_color)
-
-def display_edge_with_fake_width(viewer, edge, color=(1,0,0), width=12, n_sample=80):
-    points = ugrid(edge, method="point", num_u=n_sample)
-    viewer.display_points(points, color=color, marker="point", scale=width)
 
 def display_all_edges(viewer, edge_obj_list, highlight_indices=None, highlight_color=(0,1,0), default_color=(0.2,0.2,0.2), fake_width=14):
     highlight_indices = highlight_indices or []
     for idx, edge in enumerate(edge_obj_list):
         if idx in highlight_indices:
             viewer.display(edge, color=highlight_color)
-            display_edge_with_fake_width(viewer, edge, color=highlight_color, width=fake_width, n_sample=100)
+            # display_edge_with_fake_width(viewer, edge, color=highlight_color, width=fake_width, n_sample=100) # 可选：高亮边加粗
         else:
             viewer.display(edge, color=default_color)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "Visualize and color selected edges of BRep solid"
     )
     parser.add_argument("--solid", type=str, help="Solid STEP file")
-    parser.add_argument("--label", type=str, help="Label pkl file")  # 新增label参数
+    parser.add_argument("--label", type=str, help="Label pkl file")
     args = parser.parse_args()
 
-    # 如果你要传命令行参数，就注释掉下面这行
-    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00028.step'
-    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00028.pkl'
+    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00050.step'
+    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00050.pkl'
 
-    solid = load_step(args.solid)[0]
-    solid = solid.scale_to_unit_box()
-    graph = build_graph(solid, 10, 10, 10)
+    # --- 主要修改部分：更灵活的实体加载逻辑 ---
 
-    # 新增读取标签
+    print(f"正在加载 STEP 文件: {args.solid}...")
+    compound = load_single_compound_from_step(args.solid)
+    if compound is None:
+        print(f"错误：无法加载 STEP 文件 '{args.solid}'。文件可能已损坏或格式不受支持。")
+        sys.exit(1)
+
+    # 在对任何部分进行操作前，先进行缩放
+    compound = compound.scale_to_unit_box()
+
+    entity_to_process = None
+
+    # 1. 优先寻找 Solid
+    solids = list(compound.solids())
+    if solids:
+        print(f"成功找到 {len(solids)} 个 Solid 实体。将处理第一个。")
+        entity_to_process = solids[0]
+    else:
+        # 2. 如果没有 Solid，则寻找 Shell
+        print("未找到 Solid。正在尝试寻找 Shell...")
+        shells = list(compound.shells())
+        if shells:
+            print(f"成功找到 {len(shells)} 个 Shell 实体。将处理第一个。")
+            entity_to_process = shells[0]
+        else:
+            # 3. 如果连 Shell 都没有，则报错退出
+            print("错误：在文件中既没有找到 Solid 也没有找到 Shell。无法构建面邻接图。")
+            print("请检查 STEP 文件，它可能只包含离散的面或线，或者是一个空的 Compound。")
+            # 也可以尝试直接用 compound.faces() 获取所有面进行可视化，但无法建立邻接关系
+            sys.exit(1)
+    
+    # 现在 entity_to_process 要么是一个 Solid，要么是一个 Shell
+    graph = build_graph(entity_to_process, 10, 10, 10)
+
+    # --- 后续逻辑不变 ---
+
     labels = load_labels_from_pkl(args.label)
     assert len(labels) == len(graph.face_obj_list), f"label数({len(labels)})和面数({len(graph.face_obj_list)})不匹配"
 
     v = Viewer(backend="pyqt5")
 
-    # 改用标签上色
     display_faces_with_labels(
         v,
         graph.face_obj_list,
