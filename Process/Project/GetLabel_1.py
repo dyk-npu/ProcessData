@@ -222,13 +222,16 @@ def save_json_data(path_name: str, data: dict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="为B-Rep STEP模型自动生成面部语义标签。")
-    parser.add_argument('--base_file', type=str, required=True, help='基础STEP文件的路径。')
-    parser.add_argument('--feature_dir', type=str, required=True, help='包含特征STEP文件的目录。')
-    parser.add_argument('--config', type=str, default="attribute_config.json",required=True, help='包含标签映射的JSON配置文件路径。')
-    parser.add_argument('--output', type=str, required=True, help='输出标签JSON文件的路径。')
+    parser.add_argument('--base_file', type=str, default = "D:\CAD数据集\项目\GFR_Dataset", help='基础STEP文件的路径。')
+    parser.add_argument('--feature_dir', type=str, default = "D:\CAD数据集\项目\GFR_Dataset",  help='包含特征STEP文件的目录。')
+    parser.add_argument('--config', type=str, default="C:\\Users\\20268\Desktop\\Project\\MFR\\ProcessData\\Process\\Project\\attribute_config.json", help='包含标签映射的JSON配置文件路径。')
+    parser.add_argument('--output', type=str, default = "D:\CAD数据集\项目\GFR_Label", help='输出标签JSON文件的路径。')
     
     args = parser.parse_args()
     
+    # args.base_file = "D:\CAD数据集\项目\GFR_Dataset"
+    # args.feature_dir = "D:\CAD数据集\项目\GFR_Dataset"
+    # args.output = "D:\CAD数据集\项目\GFR_Label"
     
     # 加载配置文件
     try:

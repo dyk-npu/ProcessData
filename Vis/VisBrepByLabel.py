@@ -29,6 +29,8 @@ def load_labels_from_pkl(label_filename):
 
 # --- 新增：根据label给面上色
 def display_faces_with_labels(viewer, face_obj_list, labels):
+
+    # 淡色版本
     label_to_color = {
         0: (0.8, 0.4, 0.4),   # 淡红
         1: (0.4, 0.8, 0.4),   # 淡绿
@@ -38,6 +40,17 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
         5: (0.4, 0.8, 0.8),   # 淡青
         # 你可以继续定义更多颜色...
     }
+
+#     # 纯色版本
+#     label_to_color = {
+#     0: (1.0, 0.0, 0.0),   # 纯红
+#     1: (0.0, 1.0, 0.0),   # 纯绿
+#     2: (0.0, 0.0, 1.0),   # 纯蓝
+#     3: (1.0, 1.0, 0.0),   # 纯黄
+#     4: (1.0, 0.0, 1.0),   # 纯紫
+#     5: (0.0, 1.0, 1.0),   # 纯青
+# }
+
     default_color = (0.7, 0.7, 0.7)
     for idx, face in enumerate(face_obj_list):
         lab = labels[idx]
@@ -110,8 +123,8 @@ if __name__ == "__main__":
     parser.add_argument("--label", type=str, help="Label pkl file")
     args = parser.parse_args()
 
-    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00050.step'
-    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00050.pkl'
+    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00013.step'
+    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00013.pkl'
 
     # --- 主要修改部分：更灵活的实体加载逻辑 ---
 

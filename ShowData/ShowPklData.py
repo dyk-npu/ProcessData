@@ -9,10 +9,12 @@ def load_labels(label_filename):
     return np.array(labels)
 
 
-data = load_labels("D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00017.pkl")
+data = load_labels("D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00013.pkl")
 
+dict = data.item()
+label = dict['face_labels']
 
+print("label:",label)
 
-print("data内容类型:", type(data.item()))
-
-print("keys:", data.item()['face_labels'])
+result = [int(k) for k, v in label.items() if int(v) == 1]
+print("result:", result)
