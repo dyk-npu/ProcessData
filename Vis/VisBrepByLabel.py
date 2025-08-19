@@ -32,11 +32,11 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
 
     # 淡色版本
     label_to_color = {
-        0: (0.8, 0.4, 0.4),   # 淡红
-        1: (0.4, 0.8, 0.4),   # 淡绿
-        2: (0.4, 0.4, 0.8),   # 淡蓝
-        3: (0.8, 0.8, 0.4),   # 淡黄
-        4: (0.8, 0.4, 0.8),   # 淡紫
+        0: (0.8, 0.4, 0.4),   # 淡红 base
+        1: (0.4, 0.8, 0.4),   # 淡绿 clip
+        2: (0.4, 0.4, 0.8),   # 淡蓝 boss
+        3: (0.8, 0.8, 0.4),   # 淡黄 rib
+        4: (0.8, 0.4, 0.8),   # 淡紫 contact
         5: (0.4, 0.8, 0.8),   # 淡青
         # 你可以继续定义更多颜色...
     }
@@ -123,8 +123,8 @@ if __name__ == "__main__":
     parser.add_argument("--label", type=str, help="Label pkl file")
     args = parser.parse_args()
 
-    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00013.step'
-    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00013.pkl'
+    args.solid = 'D:/CAD数据集/项目/GFR_Dataset/GFR_00667.step'
+    args.label = 'D:/CAD数据集/项目/GFR_TrainingData_Modify/GFR_00667.pkl'
 
     # --- 主要修改部分：更灵活的实体加载逻辑 ---
 
@@ -165,6 +165,7 @@ if __name__ == "__main__":
 
     labels = load_labels_from_pkl(args.label)
     assert len(labels) == len(graph.face_obj_list), f"label数({len(labels)})和面数({len(graph.face_obj_list)})不匹配"
+
 
     v = Viewer(backend="pyqt5")
 

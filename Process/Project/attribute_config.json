@@ -34,7 +34,15 @@
     "num_srf_u": 10,
     "num_srf_v": 10,
     "num_crv_u": 10
+  },
+  "labels": {
+      "clip": 1,
+      "boss": 2,
+      "rib": 3,
+      "contact": 4
   }
+
+
 }
 
 

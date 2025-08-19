@@ -112,7 +112,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 如果你要传命令行参数，就注释掉下面这行
-    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00013.step'
+    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00001.step'
 
     print(f"正在加载 STEP 文件: {args.solid}...")
     compound = load_single_compound_from_step(args.solid)
@@ -149,11 +149,21 @@ if __name__ == "__main__":
 
     v = Viewer(backend="pyqt5")
 
+    
+
+
+    print([attr for attr in dir(v) if not attr.startswith("__")])
+
+
+    title = "Face Labels Visualization By Dyk"
+
+
+
     # --- 绘制所有面（可选）
     display_all_faces(
         v, 
         graph.face_obj_list, 
-        highlight_indices=[209, 210, 211, 217, 218, 219, 220, 221, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 355, 356, 357, 358, 359, 360],      # 这里可以指定要高亮的面编号，如 [2,5]
+        highlight_indices =  [9,10,26,27,38,43,44,51],      # 这里可以指定要高亮的面编号，如 [2,5]
         highlight_color=(0,1,0), 
         default_color=(0.8,0.8,0.8)
     )
