@@ -112,7 +112,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 如果你要传命令行参数，就注释掉下面这行
-    args.solid = 'D:\CAD数据集\项目\GFR_Dataset\GFR_00001.step'
+    args.solid = 'D:\CAD数据集\项目\GFR_Dataset_Final\GFR_00010.step'
 
     print(f"正在加载 STEP 文件: {args.solid}...")
     compound = load_single_compound_from_step(args.solid)
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     display_all_faces(
         v, 
         graph.face_obj_list, 
-        highlight_indices =  [9,10,26,27,38,43,44,51],      # 这里可以指定要高亮的面编号，如 [2,5]
+        highlight_indices =  [],      # 这里可以指定要高亮的面编号，如 [2,5]
         highlight_color=(0,1,0), 
         default_color=(0.8,0.8,0.8)
     )
