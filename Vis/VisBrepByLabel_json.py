@@ -116,9 +116,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 假设您的文件路径如下，如果通过命令行传入，可以注释掉这两行
-    args.solid = r'D:\\CAD数据集\\项目\\GFR_Dataset_Final\\GFR_02617.step'
+    args.solid = r'D:\\CAD数据集\\项目\\GFR_Dataset_Final\\GFR_02664.step'
     # --- 修改：将标签文件名从 .pkl 改为 .json ---
-    args.label = r'D:\CAD数据集\项目\GFR_dataset_label_hybrid\GFR_02617.json' # 假设您的json文件名与pkl一致
+    args.label = r'D:\CAD数据集\项目\GFR_dataset_label_hybrid\GFR_02664.json' # 假设您的json文件名与pkl一致
 
     # --- 主要修改部分：更灵活的实体加载逻辑 (此部分无需改动) ---
     print(f"正在加载 STEP 文件: {args.solid}...")
