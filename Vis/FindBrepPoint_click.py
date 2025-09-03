@@ -1,110 +1,122 @@
 import sys
+from collections import defaultdict
 import argparse
 
 # --- 使用底层 python-occ 库 ---
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.TopExp import TopExp_Explorer
 from OCC.Core.TopAbs import TopAbs_VERTEX
-from OCC.Core.gp import gp_Pnt
 
-# --- 仅使用 occwl 加载 STEP 文件 ---
+# --- 仍然使用 occwl 进行加载和显示 ---
 from occwl.compound import Compound
+from occwl.viewer import Viewer
 from occwl.face import Face
 
 # --- 全局变量 ---
-# 用于存储全局顶点索引的映射字典
-vertex_coord_str_to_global_id = {}
+# 仍然需要这个列表来跟踪哪些面当前处于选中状态
+selected_face_objects = [] 
+# 新增：提前创建 Face 对象到其稳定索引的映射，以便在回调中随时使用
+face_to_id_map = {}
 
-def _quantize_point(p: gp_Pnt) -> str:
-    """
-    将一个 gp_Pnt 对象的坐标量化成一个唯一的字符串键。
-    """
-    return f"{p.X():.3f}_{p.Y():.3f}_{p.Z():.3f}"
 
-def process_and_print_face_info(face: Face, face_id: int):
+def get_and_print_face_vertices(face: Face):
     """
-    一个辅助函数，用于提取单个面的顶点坐标及其自定义的全局索引并打印。
+    一个辅助函数，用于提取单个面的顶点坐标并将其打印到控制台。
     """
+    face_id = face_to_id_map.get(face, -1) # -1 表示未找到，但理论上不会发生
 
-    points_with_ids = []
+    points = []
     topo_face = face.topods_shape() 
 
     exp = TopExp_Explorer(topo_face, TopAbs_VERTEX)
     while exp.More():
-        # ★★★ 核心修改：直接使用 exp.Current()，不再用 topods_Vertex() 包裹 ★★★
         topo_vertex = exp.Current()
         pt = BRep_Tool.Pnt(topo_vertex)
-        
-        # 使用我们自定义的、可靠的坐标量化方法来查找全局索引
-        coord_key = _quantize_point(pt)
-        global_id = vertex_coord_str_to_global_id.get(coord_key, -1)
-        
         xyz = (pt.X(), pt.Y(), pt.Z())
-        points_with_ids.append((global_id, xyz))
-        
+        points.append(xyz)
         exp.Next()
     
-    # 去重并按全局ID排序
-    unique_points = sorted(list(set(points_with_ids)), key=lambda item: item[0])
+    unique_points = sorted(list(set(points)))
 
-    # --- 格式化输出 ---
-    print("\n" + "-" * 55)
-    print(f"▶️ 正在处理 面 (Face) 的索引: {face_id}")
+    # --- 格式化实时输出 ---
+    print("\n" + "-" * 25)
+    print(f"✅ 已选择 面 (Face) 的索引: {face_id}")
     if not unique_points:
         print("  - 该面没有独立的顶点。")
-    for i, (global_id, (x, y, z)) in enumerate(unique_points):
-        print(f"  顶点 {i+1} (全局索引: {global_id}): (X={x:.4f}, Y={y:.4f}, Z={z:.4f})")
-    print("-" * 55)
+    for i, (x, y, z) in enumerate(unique_points):
+        print(f"  顶点 {i+1}: (X={x:.4f}, Y={y:.4f}, Z={z:.4f})")
+    print("-" * 25)
+
+
+def on_select(shapes, x, y):
+    """
+    回调函数，现在负责实时处理选择、取消选择，并立即打印结果。
+    """
+    if not shapes:
+        return
+        
+    shape = shapes[0]
+    if isinstance(shape, Face):
+        face = shape
+        if face in selected_face_objects:
+            # --- 这是取消选择的逻辑 ---
+            selected_face_objects.remove(face)
+            face_id = face_to_id_map.get(face, -1)
+            print("\n" + "-" * 25)
+            print(f"❌ 已取消选择 面 (Face) 的索引: {face_id}")
+            print("-" * 25)
+        else:
+            # --- 这是选择的逻辑 ---
+            selected_face_objects.append(face)
+            # 立即调用函数来提取并打印这个刚被选中的面的坐标
+            get_and_print_face_vertices(face)
 
 
 if __name__ == "__main__":
+
+    
     parser = argparse.ArgumentParser(
-        description="从STEP文件中提取指定面的顶点的全局索引和坐标。"
+        description="从一个STEP文件中交互式地选择面，并实时导出其顶点的坐标。"
     )
-    # ★★★ 修改：让 step_file 参数变为可选，并设置默认值 ★★★
-    parser.add_argument("step_file", type=str, nargs='?', default=r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02664.step", help="输入的STEP文件路径")
-    parser.add_argument("--faces", nargs='+', type=int, help="要处理的面索引列表，例如: --faces 2 5 222")
+    parser.add_argument("--step_file", type=str,default = r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02664.step", help="输入的STEP文件路径")
     args = parser.parse_args()
 
-    if args.faces:
-        face_indices_to_process = args.faces
-        print(f"将处理通过命令行指定的面: {face_indices_to_process}")
-    else:
-        face_indices_to_process = [2, 5, 222, 223]
-        print(f"未从命令行指定面，将使用代码中定义的默认列表: {face_indices_to_process}")
-
     try:
-        print(f"\n正在加载 STEP 文件: {args.step_file}...")
+        print(f"正在加载 STEP 文件: {args.step_file}...")
         shape = Compound.load_from_step(args.step_file)
         all_faces = list(shape.faces())
+        
+        # --- 核心修改：在程序开始时就构建好 Face 到 ID 的映射 ---
+        face_to_id_map = {face: i for i, face in enumerate(all_faces)}
+        
         print(f"加载成功！模型包含 {len(all_faces)} 个面。")
-
-        print("正在为整个模型构建全局顶点索引...")
-        global_vertex_counter = 0
-        exp = TopExp_Explorer(shape.topods_shape(), TopAbs_VERTEX)
-        while exp.More():
-            # ★★★ 核心修改：直接使用 exp.Current() ★★★
-            vertex = exp.Current()
-            point = BRep_Tool.Pnt(vertex)
-            coord_key = _quantize_point(point)
-            if coord_key not in vertex_coord_str_to_global_id:
-                vertex_coord_str_to_global_id[coord_key] = global_vertex_counter
-                global_vertex_counter += 1
-            exp.Next()
-        print(f"索引构建完成！模型中共有 {global_vertex_counter} 个唯一的顶点。")
-
     except Exception as e:
-        print(f"错误: 加载或处理STEP文件失败。错误信息: {e}")
+        print(f"错误: 加载STEP文件失败。请检查文件路径或文件是否损坏。错误信息: {e}")
         sys.exit(1)
 
-    print("\n====== 开始处理指定的面 ======")
-    for face_index in face_indices_to_process:
-        if 0 <= face_index < len(all_faces):
-            face_to_process = all_faces[face_index]
-            process_and_print_face_info(face_to_process, face_index)
-        else:
-            print("\n" + "-" * 55)
-            print(f"⚠️ 警告: 索引 {face_index} 超出范围 (模型总面数: {len(all_faces)})，已跳过。")
-            print("-" * 55)
+    viewer = Viewer(backend="pyqt5")
+    
+    print("正在将面渲染到查看器中...")
+    for face in all_faces:
+        viewer.display(face, color=(0.7, 0.7, 0.8), transparency=0.5)
+    print("渲染完成。")
+    
+    viewer.on_select(on_select)
 
-    print("\n====== 处理完成 ======")
+    print("\n" + "="*60)
+    print("操作指南:")
+    print("1. 一个包含您模型的交互式窗口已经打开。")
+    print("2. 使用鼠标左键点击任意一个面来选中它。")
+    print("3. 【新】选中后，顶点的坐标会立即显示在下方的控制台中。")
+    print("4. 再次点击已选中的面可以取消选择。")
+    print("5. 完成所有操作后，请直接【关闭】查看器窗口以退出程序。")
+    print("="*60 + "\n")
+    
+    viewer.fit()
+    viewer.show()
+
+    # --- 主程序在窗口关闭后不再需要进行数据处理 ---
+    print("\n查看器已关闭。程序执行完毕。")
+    if selected_face_objects:
+        final_selected_ids = sorted([face_to_id_map.get(f) for f in selected_face_objects])
+        print(f"最终处于选中状态的面索引为: {final_selected_ids}")
