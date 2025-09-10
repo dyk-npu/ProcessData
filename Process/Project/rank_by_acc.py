@@ -1,12 +1,12 @@
 import pandas as pd
 
 # 定义要读取和保存的文件名
-input_filename = 'C:\\Users\\20268\\Desktop\\项目\\数据集\\stratege_hybrid\\accuracy_hybrid.csv'  # <--- 请将这里替换成您的原始文件名
-output_filename = 'C:\\Users\\20268\\Desktop\\项目\\数据集\\stratege_hybrid\\accuracy_hybrid_rank_by_acc.csv' # <--- 这是排序后新文件的名称
+input_filename = r"C:\Users\20268\Desktop\项目\数据集\stratege_hybrid_point_1.0_attribute_1.0_V2.0\hybrid_point_1.0_attribute_1.0_V2.0.csv" # <--- 请将这里替换成您的原始文件名
+output_filename = r"C:\Users\20268\Desktop\项目\数据集\stratege_hybrid_point_1.0_attribute_1.0_V2.0\acc_hybrid_point_1.0_attribute_1.0_V2.0.csv" # <--- 这是排序后新文件的名称
 
 try:
     # 1. 读取CSV文件到pandas DataFrame
-    df = pd.read_csv(input_filename, encoding='gbk')
+    df = pd.read_csv(input_filename, encoding='utf-8-sig')
 
     # 2. 数据清洗与转换
     # 创建一个新列用于排序，将“准确率”列中的百分号'%'去掉，并转换为数值

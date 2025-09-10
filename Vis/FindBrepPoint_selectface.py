@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="处理并可视化STEP文件中的指定面。"
     )
-    parser.add_argument("step_file", type=str, nargs='?', default=r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02664.step", help="输入的STEP文件路径")
+    parser.add_argument("step_file", type=str, nargs='?', default=r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_00563.step", help="输入的STEP文件路径")
     parser.add_argument("--faces", nargs='+', type=int, help="要处理和高亮的面索引列表，例如: --faces 2 5 222")
     args = parser.parse_args()
 

@@ -41,10 +41,20 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
         1: (0.0, 1.0, 0.0),   # 纯绿
         2: (0.0, 0.0, 1.0),   # 纯蓝
         3: (1.0, 1.0, 0.0),   # 纯黄
-        4: (1.0, 0.0, 1.0),   # 纯紫
+        4: (1.0, 0.0, 1.0),   # 纯紫 
         5: (0.0, 1.0, 1.0),   # 纯青
     }
+    """
+      "labels": {
+      "clip": 1,
+      "boss": 2,
+      "rib": 3,
+      "contact": 4
+  }
 
+    """
+
+    
     default_color = (0.7, 0.7, 0.7)
     for idx, face in enumerate(face_obj_list):
         lab = labels[idx]
@@ -116,9 +126,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 假设您的文件路径如下，如果通过命令行传入，可以注释掉这两行
-    args.solid = r'D:\\CAD数据集\\项目\\GFR_Dataset_Final\\GFR_02664.step'
+    args.solid = r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02422.step"
     # --- 修改：将标签文件名从 .pkl 改为 .json ---
-    args.label = r'D:\CAD数据集\项目\GFR_dataset_label_hybrid\GFR_02664.json' # 假设您的json文件名与pkl一致
+    args.label = r"D:\CAD数据集\项目\GFR_dataset_label_hybrid_point_1.0_attribute_1.0_V2.0\GFR_02422.json" # 假设您的json文件名与pkl一致
 
     # --- 主要修改部分：更灵活的实体加载逻辑 (此部分无需改动) ---
     print(f"正在加载 STEP 文件: {args.solid}...")

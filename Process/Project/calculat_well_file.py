@@ -33,9 +33,7 @@ def count_valid_files(csv_path):
             valid_files.append(file_name)
 
     print(f"\n符合条件的文件总数: {valid_count}")
-    # print("文件名列表:")
-    # for f in valid_files:
-    #     print("  ", f)
+
 
     return valid_count, valid_files
 

@@ -1,5 +1,5 @@
 import pickle
-with open("/workspace/data/JointData/Preprocessed/joint/val.pickle", "rb") as f:
+with open(r"D:\CAD数据集\j1.0.0\joint\j1.0.0_preprocessed\j1.0.0_preprocessed\val.pickle", "rb") as f:
     data = pickle.load(f)
 print(data.keys())
 

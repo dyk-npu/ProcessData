@@ -1,0 +1,29 @@
+2025-09-04 16:00:27 - INFO - --- CAD数据预处理开始 ---
+2025-09-04 16:00:27 - INFO - 输入数据目录: /data_hdd/dev01/dyk/dyk_data/data_1/step
+2025-09-04 16:00:27 - INFO - 输出数据目录: /data_hdd/dev01/dyk/dyk_data/data_1/NurbsFeature
+2025-09-04 16:00:27 - INFO - 数据集划分文件: /data_hdd/dev01/dyk/model/Assembly-raw/Utils/ProcessFile/train_val_test_split.json
+2025-09-04 16:00:33 - INFO - 成功加载文件列表，共找到 23029 个匹配的模型待处理。
+2025-09-04 16:00:34 - WARNING - [模型: 100218_83ec552f_0000_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100218_83ec552f_0000_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100218_83ec552f_0001_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100218_83ec552f_0001_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100221_4d7b66c4_0000_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100221_4d7b66c4_0001_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100221_4d7b66c4_0001_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100243_9fb796fe_0010_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:36 - WARNING - [模型: 100243_9fb796fe_0010_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0011_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0011_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0012_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0014_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0015_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0016_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100243_9fb796fe_0016_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0000_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0001_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0003_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0003_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0004_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100261_66bf0666_0004_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:37 - WARNING - [模型: 100326_0602c712_0000_1] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined
+2025-09-04 16:00:38 - WARNING - [模型: 100326_0602c712_0000_2] 诊断: get_nurbs_data内部发生未知错误: name 'bspline_surface_from_face' is not defined

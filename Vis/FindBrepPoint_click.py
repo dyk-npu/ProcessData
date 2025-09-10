@@ -78,7 +78,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="从一个STEP文件中交互式地选择面，并实时导出其顶点的坐标。"
     )
-    parser.add_argument("--step_file", type=str,default = r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02664.step", help="输入的STEP文件路径")
+    parser.add_argument("--step_file", type=str,default = r"D:\CAD数据集\项目\GFR_Dataset_Final\GFR_02617.step", help="输入的STEP文件路径")
     args = parser.parse_args()
 
     try:
