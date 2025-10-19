@@ -45,6 +45,7 @@ def display_faces_with_labels(viewer, face_obj_list, labels):
     }
     """
       "labels": {
+      "based": 0,
       "clip": 1,
       "boss": 2,
       "rib": 3,

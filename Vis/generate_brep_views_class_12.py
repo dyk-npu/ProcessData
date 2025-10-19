@@ -20,7 +20,7 @@ shutup.please()  # 静音警告信息
 # --- 视图配置 ---
 NUM_VIEWS = 12
 HORIZONTAL_ANGLE_STEP = 360 / NUM_VIEWS
-VERTICAL_ANGLE_DEG = 35
+VERTICAL_ANGLE_DEG = 90
 # ---------------------
 
 

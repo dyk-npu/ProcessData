@@ -2,3 +2,5 @@ __pycache__/
 .vscode/
 Data/
 dist/
+test_folder/
+dist/
